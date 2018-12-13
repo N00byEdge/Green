@@ -78,7 +78,6 @@ namespace Green {
       TimerGuard lock;
       if(ended) return;
       joining = running;
-      if(ready.empty()) throw std::runtime_error{"Nowhere to go!\n"};
       auto next = ready.front();
       ready.pop_front();
       auto suspended = std::exchange(running, next);
@@ -96,7 +95,6 @@ namespace Green {
         if(dis->joining)
           return dis->joining;
         auto next = ready.front();
-        if(!next) throw std::runtime_error{"Nowhere to go!\n"};
         ready.pop_front();
         return next;
       }();
@@ -109,7 +107,6 @@ namespace Green {
   struct ConditionVariable {
     std::queue<Fiber *> waiting;
     void wait() {
-      if(ready.empty()) throw std::runtime_error{"Nowhere to go!\n"};
       waiting.emplace(std::exchange(running, ready.back()));
       ready.pop_back();
       Fiber::Yield();
